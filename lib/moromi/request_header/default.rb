@@ -1,5 +1,7 @@
 module Moromi
   module RequestHeader
-    VERSION = '0.2.0'
+    class Default
+      include Core
+    end
   end
 end

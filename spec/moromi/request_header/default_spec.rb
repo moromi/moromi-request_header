@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Moromi::RequestHeader::Ios do
+describe Moromi::RequestHeader::Default do
   describe '::header_names' do
-    subject { Moromi::RequestHeader::Ios.header_names(app_name: app_name) }
+    subject { Moromi::RequestHeader::Default.header_names(app_name: app_name) }
 
     let(:app_name) { 'moromi' }
 
@@ -12,6 +12,7 @@ describe Moromi::RequestHeader::Ios do
         bundle_identifier: 'X-Moromi-Bundle-Identifier',
         bundle_version_string: 'X-Moromi-Bundle-Version-String',
         bundle_version: 'X-Moromi-Bundle-Version',
+        platform: 'X-Moromi-Platform',
         os: 'X-Moromi-Os',
         os_version: 'X-Moromi-Os-Version',
         device_model: 'X-Moromi-Device-Model',
@@ -26,7 +27,7 @@ describe Moromi::RequestHeader::Ios do
   end
 
   describe '::header_name' do
-    subject { Moromi::RequestHeader::Ios.header_name(property, app_name: app_name) }
+    subject { Moromi::RequestHeader::Default.header_name(property, app_name: app_name) }
 
     let(:property) {}
     let(:app_name) { 'moromi' }
@@ -43,7 +44,7 @@ describe Moromi::RequestHeader::Ios do
   end
 
   describe '#create' do
-    subject { Moromi::RequestHeader::Ios.create(app_name: app_name, args: args) }
+    subject { Moromi::RequestHeader::Default.create(app_name: app_name, args: args) }
 
     let(:app_name) { 'moromi' }
     let(:args) do
@@ -52,6 +53,7 @@ describe Moromi::RequestHeader::Ios do
         bundle_identifier: 'com.example.moromi.HttpHeader',
         bundle_version_string: '1.0.0',
         bundle_version: '1',
+        platform: 'ios',
         os: 'ios',
         os_version: '10.2',
         device_model: 'iPhone8,1',
@@ -62,11 +64,12 @@ describe Moromi::RequestHeader::Ios do
       }
     end
 
-    it { expect(subject).to be_instance_of Moromi::RequestHeader::Ios }
+    it { expect(subject).to be_instance_of Moromi::RequestHeader::Default }
     it { expect(subject.token).to eq 'Token' }
     it { expect(subject.bundle_identifier).to eq 'com.example.moromi.HttpHeader' }
     it { expect(subject.bundle_version_string).to eq '1.0.0' }
     it { expect(subject.bundle_version).to eq '1' }
+    it { expect(subject.platform).to eq 'ios' }
     it { expect(subject.os).to eq 'ios' }
     it { expect(subject.os_version).to eq '10.2' }
     it { expect(subject.device_model).to eq 'iPhone8,1' }
@@ -78,7 +81,7 @@ describe Moromi::RequestHeader::Ios do
 
 
   describe '#initialize' do
-    subject { Moromi::RequestHeader::Ios.new(headers: headers, app_name: app_name) }
+    subject { Moromi::RequestHeader::Default.new(headers: headers, app_name: app_name) }
 
     let(:headers) do
       {
@@ -86,6 +89,7 @@ describe Moromi::RequestHeader::Ios do
         'X-Moromi-Bundle-Identifier' => 'com.example.moromi.HttpHeader',
         'X-Moromi-Bundle-Version-String' => '1.0.0',
         'X-Moromi-Bundle-Version' => '1',
+        'X-Moromi-Platform' => 'ios',
         'X-Moromi-Os' => 'ios',
         'X-Moromi-Os-Version' => '10.2',
         'X-Moromi-Device-Model' => 'iPhone8,1',
@@ -98,11 +102,12 @@ describe Moromi::RequestHeader::Ios do
 
     let(:app_name) { 'moromi' }
 
-    it { expect(subject).to be_instance_of Moromi::RequestHeader::Ios }
+    it { expect(subject).to be_instance_of Moromi::RequestHeader::Default }
     it { expect(subject.token).to eq 'Token' }
     it { expect(subject.bundle_identifier).to eq 'com.example.moromi.HttpHeader' }
     it { expect(subject.bundle_version_string).to eq '1.0.0' }
     it { expect(subject.bundle_version).to eq '1' }
+    it { expect(subject.platform).to eq 'ios' }
     it { expect(subject.os).to eq 'ios' }
     it { expect(subject.os_version).to eq '10.2' }
     it { expect(subject.device_model).to eq 'iPhone8,1' }
@@ -113,7 +118,7 @@ describe Moromi::RequestHeader::Ios do
   end
 
   describe '#to_hash' do
-    subject { Moromi::RequestHeader::Ios.new(headers: headers, app_name: app_name).to_hash }
+    subject { Moromi::RequestHeader::Default.new(headers: headers, app_name: app_name).to_hash }
 
     let(:headers) do
       {
@@ -121,6 +126,7 @@ describe Moromi::RequestHeader::Ios do
         'X-Moromi-Bundle-Identifier' => 'com.example.moromi.HttpHeader',
         'X-Moromi-Bundle-Version-String' => '1.0.0',
         'X-Moromi-Bundle-Version' => '1',
+        'X-Moromi-Platform' => 'ios',
         'X-Moromi-Os' => 'ios',
         'X-Moromi-Os-Version' => '10.2',
         'X-Moromi-Device-Model' => 'iPhone8,1',

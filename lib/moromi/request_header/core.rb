@@ -1,13 +1,17 @@
-require 'active_support/core_ext/string'
+require 'active_support'
+require 'active_support/core_ext'
 
 module Moromi
   module RequestHeader
-    class Ios
+    module Core
+      extend ActiveSupport::Concern
+
       PROPERTIES = %i(
         token
         bundle_identifier
         bundle_version_string
         bundle_version
+        platform
         os
         os_version
         device_model
@@ -15,7 +19,10 @@ module Moromi
         seconds_from_gmt
         language_code
         region_code
-      )
+      ).freeze
+
+      PROPERTY_DEFAULT_VALUES = {
+      }.freeze
 
       attr_accessor *PROPERTIES
 
@@ -25,19 +32,24 @@ module Moromi
         names = self.class::header_names(app_name: @app_name)
         self.class::PROPERTIES.each do |property|
           name = names[property]
-          send("#{property.to_s}=", headers[name]) rescue nil
+          value = headers[name] || PROPERTY_DEFAULT_VALUES[property]
+          public_send("#{property.to_s}=", value)
+        rescue
+          nil
         end
       end
 
       def to_hash
         {}.tap do |results|
           self.class::header_names(app_name: @app_name).invert.each do |k, v|
-            results[k] = send(v) rescue nil
+            results[k] = public_send(v)
+          rescue
+            nil
           end
         end
       end
 
-      class << self
+      class_methods do
         def default_app_name
           Moromi::RequestHeader.config.app_name
         end
@@ -54,6 +66,7 @@ module Moromi
             bundle_identifier: "X-#{app_class_name}-Bundle-Identifier",
             bundle_version_string: "X-#{app_class_name}-Bundle-Version-String",
             bundle_version: "X-#{app_class_name}-Bundle-Version",
+            platform: "X-#{app_class_name}-Platform", # ios, android, web, etc
             os: "X-#{app_class_name}-Os",
             os_version: "X-#{app_class_name}-Os-Version",
             device_model: "X-#{app_class_name}-Device-Model",
@@ -67,9 +80,17 @@ module Moromi
         def create(app_name: nil, args: {})
           new(app_name: app_name).tap do |header|
             PROPERTIES.each do |property|
-              header.send("#{property.to_s}=", args[property]) rescue nil
+              value = args[property] || PROPERTY_DEFAULT_VALUES[property]
+              header.public_send("#{property.to_s}=", value)
+            rescue
+              nil
             end
           end
+        end
+
+        def fetch_header(key, headers, app_name)
+          name = header_name(key, app_name: app_name)
+          headers[name].presence || headers[key]
         end
       end
     end
